@@ -102,6 +102,9 @@ export const ReactEditor = {
 
   blur(editor: ReactEditor): void {
     const el = ReactEditor.toDOMNode(editor, editor)
+    if (!el) {
+      return
+    }
     IS_FOCUSED.set(editor, false)
 
     if (window.document.activeElement === el) {
@@ -115,6 +118,9 @@ export const ReactEditor = {
 
   focus(editor: ReactEditor): void {
     const el = ReactEditor.toDOMNode(editor, editor)
+    if (!el) {
+      return
+    }
     IS_FOCUSED.set(editor, true)
 
     if (window.document.activeElement !== el) {
@@ -150,6 +156,9 @@ export const ReactEditor = {
   ): boolean {
     const { editable = false } = options
     const editorEl = ReactEditor.toDOMNode(editor, editor)
+    if (!editorEl) {
+      return false
+    }
     let targetEl
 
     // COMPAT: In Firefox, reading `target.nodeType` will throw an error if
@@ -192,15 +201,15 @@ export const ReactEditor = {
    * Find the native DOM element from a Slate node.
    */
 
-  toDOMNode(editor: ReactEditor, node: Node): HTMLElement {
+  toDOMNode(editor: ReactEditor, node: Node): HTMLElement | undefined {
     const domNode = Editor.isEditor(node)
       ? EDITOR_TO_ELEMENT.get(editor)
       : KEY_TO_ELEMENT.get(ReactEditor.findKey(editor, node))
 
     if (!domNode) {
-      throw new Error(
-        `Cannot resolve a DOM node from Slate node: ${JSON.stringify(node)}`
-      )
+      // console.warn(
+      //   `Cannot resolve a DOM node from Slate node: ${JSON.stringify(node)}`
+      // )
     }
 
     return domNode
@@ -210,9 +219,12 @@ export const ReactEditor = {
    * Find a native DOM selection point from a Slate point.
    */
 
-  toDOMPoint(editor: ReactEditor, point: Point): DOMPoint {
+  toDOMPoint(editor: ReactEditor, point: Point): DOMPoint | undefined {
     const [node] = Editor.node(editor, point.path)
     const el = ReactEditor.toDOMNode(editor, node)
+    if (!el) {
+      return
+    }
     let domPoint: DOMPoint | undefined
 
     // If we're inside a void node, force the offset to 0, otherwise the zero
@@ -262,13 +274,19 @@ export const ReactEditor = {
    * Find a native DOM range from a Slate `range`.
    */
 
-  toDOMRange(editor: ReactEditor, range: Range): DOMRange {
+  toDOMRange(editor: ReactEditor, range: Range): DOMRange | undefined {
     const { anchor, focus } = range
     const domAnchor = ReactEditor.toDOMPoint(editor, anchor)
+    if (!domAnchor) {
+      return
+    }
     const domFocus = Range.isCollapsed(range)
       ? domAnchor
       : ReactEditor.toDOMPoint(editor, focus)
 
+    if (!domFocus) {
+      return
+    }
     const domRange = window.document.createRange()
     const start = Range.isBackward(range) ? domFocus : domAnchor
     const end = Range.isBackward(range) ? domAnchor : domFocus

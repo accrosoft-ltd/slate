@@ -147,6 +147,10 @@ export const Editable = (props: EditableProps) => {
 
     const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
+    if (!newDomRange) {
+      return
+    }
+
     // If the DOM selection is already correct, we're done.
     if (
       hasDomSelection &&
@@ -158,13 +162,22 @@ export const Editable = (props: EditableProps) => {
 
     // Otherwise the DOM selection is out of sync, so update it.
     const el = ReactEditor.toDOMNode(editor, editor)
+    if (!el) {
+      return
+    }
     state.isUpdatingSelection = true
     domSelection.removeAllRanges()
 
     if (newDomRange) {
       domSelection.addRange(newDomRange!)
+
       const leafEl = newDomRange.startContainer.parentElement!
-      scrollIntoView(leafEl, { scrollMode: 'if-needed' })
+      scrollIntoView(leafEl, {
+        scrollMode: 'if-needed',
+        // MK Fix jumpy scroll
+        // https://github.com/kenchi/slate/commit/1652ecab52088e64ffbaa130fa4049f60cdce57e
+        boundary: el,
+      })
     }
 
     setTimeout(() => {
@@ -355,6 +368,9 @@ export const Editable = (props: EditableProps) => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
         const { activeElement } = window.document
         const el = ReactEditor.toDOMNode(editor, editor)
+        if (!el) {
+          return
+        }
         const domSelection = window.getSelection()
         const domRange =
           domSelection &&
@@ -490,6 +506,9 @@ export const Editable = (props: EditableProps) => {
 
             const { relatedTarget } = event
             const el = ReactEditor.toDOMNode(editor, editor)
+            if (!el) {
+              return
+            }
 
             // COMPAT: The event should be ignored if the focus is returning
             // to the editor from an embedded editable element (eg. an <input>
@@ -680,6 +699,9 @@ export const Editable = (props: EditableProps) => {
               !isEventHandled(event, attributes.onFocus)
             ) {
               const el = ReactEditor.toDOMNode(editor, editor)
+              if (!el) {
+                return
+              }
               state.latestElement = window.document.activeElement
 
               // COMPAT: If the editor has nested editable elements, the focus
@@ -1037,6 +1059,9 @@ const setFragmentData = (
   // Create a fake selection so that we can add a Base64-encoded copy of the
   // fragment to the HTML, to decode on future pastes.
   const domRange = ReactEditor.toDOMRange(editor, selection)
+  if (!domRange) {
+    return
+  }
   let contents = domRange.cloneContents()
   let attach = contents.childNodes[0] as HTMLElement
 
@@ -1054,8 +1079,10 @@ const setFragmentData = (
     const [voidNode] = endVoid
     const r = domRange.cloneRange()
     const domNode = ReactEditor.toDOMNode(editor, voidNode)
-    r.setEndAfter(domNode)
-    contents = r.cloneContents()
+    if (domNode) {
+      r.setEndAfter(domNode)
+      contents = r.cloneContents()
+    }
   }
 
   // COMPAT: If the start node is a void node, we need to attach the encoded
