@@ -241,9 +241,10 @@ export const Editable = (props: EditableProps) => {
 
           if (targetRange) {
             const range = ReactEditor.toSlateRange(editor, targetRange)
-
-            if (!selection || !Range.equals(selection, range)) {
-              Transforms.select(editor, range)
+            if (range) {
+              if (!selection || !Range.equals(selection, range)) {
+                Transforms.select(editor, range)
+              }
             }
           }
         }
@@ -390,7 +391,9 @@ export const Editable = (props: EditableProps) => {
           hasEditableTarget(editor, domRange.endContainer)
         ) {
           const range = ReactEditor.toSlateRange(editor, domRange)
-          Transforms.select(editor, range)
+          if (range) {
+            Transforms.select(editor, range)
+          }
         } else {
           Transforms.deselect(editor)
         }
@@ -682,6 +685,9 @@ export const Editable = (props: EditableProps) => {
               ) {
                 event.preventDefault()
                 const range = ReactEditor.findEventRange(editor, event)
+                if (!range) {
+                  return
+                }
                 const data = event.dataTransfer
                 Transforms.select(editor, range)
                 ReactEditor.insertData(editor, data)

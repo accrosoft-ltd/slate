@@ -319,7 +319,7 @@ export const ReactEditor = {
    * Get the target range from a DOM `event`.
    */
 
-  findEventRange(editor: ReactEditor, event: any): Range {
+  findEventRange(editor: ReactEditor, event: any): Range | null {
     if ('nativeEvent' in event) {
       event = event.nativeEvent
     }
@@ -378,6 +378,7 @@ export const ReactEditor = {
 
     // Resolve a Slate range from the DOM range.
     const range = ReactEditor.toSlateRange(editor, domRange)
+
     return range
   },
 
@@ -385,7 +386,7 @@ export const ReactEditor = {
    * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
    */
 
-  toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): Point {
+  toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): Point | null {
     const [nearestNode, nearestOffset] = normalizeDOMPoint(domPoint)
     const parentNode = nearestNode.parentNode as DOMElement
     let textNode: DOMElement | null = null
@@ -445,9 +446,10 @@ export const ReactEditor = {
     }
 
     if (!textNode) {
-      throw new Error(
-        `Cannot resolve a Slate point from DOM point: ${domPoint}`
-      )
+      return null
+      // throw new Error(
+      //   `Cannot resolve a Slate point from DOM point: ${domPoint}`
+      // )
     }
 
     // COMPAT: If someone is clicking from one Slate editor into another,
@@ -465,7 +467,7 @@ export const ReactEditor = {
   toSlateRange(
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection
-  ): Range {
+  ): Range | null {
     const el =
       domRange instanceof Selection
         ? domRange.anchorNode
@@ -498,16 +500,22 @@ export const ReactEditor = {
       anchorOffset == null ||
       focusOffset == null
     ) {
-      throw new Error(
-        `Cannot resolve a Slate range from DOM range: ${domRange}`
-      )
+      return null
+      // throw new Error(
+      //   `Cannot resolve a Slate range from DOM range: ${domRange}`
+      // )
     }
 
     const anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
+    if (!anchor) {
+      return null
+    }
     const focus = isCollapsed
       ? anchor
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
-
+    if (!focus) {
+      return null
+    }
     return { anchor, focus }
   },
 }
