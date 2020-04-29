@@ -9,7 +9,6 @@ import {
   Transforms,
 } from 'slate'
 import throttle from 'lodash/throttle'
-import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
 import Hotkeys from '../utils/hotkeys'
@@ -172,12 +171,13 @@ export const Editable = (props: EditableProps) => {
       domSelection.addRange(newDomRange!)
 
       const leafEl = newDomRange.startContainer.parentElement!
-      scrollIntoView(leafEl, {
-        scrollMode: 'if-needed',
-        // MK Fix jumpy scroll
-        // https://github.com/kenchi/slate/commit/1652ecab52088e64ffbaa130fa4049f60cdce57e
-        boundary: el,
-      })
+      // MK Fix jumpy scroll
+      // scrollIntoView(leafEl, {
+      //   scrollMode: 'if-needed',
+
+      //   // https://github.com/kenchi/slate/commit/1652ecab52088e64ffbaa130fa4049f60cdce57e
+      //   boundary: el,
+      // })
     }
 
     setTimeout(() => {
