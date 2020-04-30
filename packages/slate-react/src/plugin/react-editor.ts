@@ -262,9 +262,10 @@ export const ReactEditor = {
     }
 
     if (!domPoint) {
-      throw new Error(
-        `Cannot resolve a DOM point from Slate point: ${JSON.stringify(point)}`
-      )
+      return
+      // throw new Error(
+      //   `Cannot resolve a DOM point from Slate point: ${JSON.stringify(point)}`
+      // )
     }
 
     return domPoint
@@ -299,7 +300,7 @@ export const ReactEditor = {
    * Find a Slate node from a native DOM `element`.
    */
 
-  toSlateNode(editor: ReactEditor, domNode: DOMNode): Node {
+  toSlateNode(editor: ReactEditor, domNode: DOMNode): Node | null {
     let domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
 
     if (domEl && !domEl.hasAttribute('data-slate-node')) {
@@ -309,7 +310,7 @@ export const ReactEditor = {
     const node = domEl ? ELEMENT_TO_NODE.get(domEl as HTMLElement) : null
 
     if (!node) {
-      throw new Error(`Cannot resolve a Slate node from DOM node: ${domEl}`)
+      return null
     }
 
     return node
@@ -327,10 +328,14 @@ export const ReactEditor = {
     const { clientX: x, clientY: y, target } = event
 
     if (x == null || y == null) {
-      throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
+      return null
+      //throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
     const node = ReactEditor.toSlateNode(editor, event.target)
+    if (!node) {
+      return null
+    }
     const path = ReactEditor.findPath(editor, node)
 
     // If the drop target is inside a void node, move it into either the
@@ -373,7 +378,8 @@ export const ReactEditor = {
     }
 
     if (!domRange) {
-      throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
+      return null
+      //throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
     // Resolve a Slate range from the DOM range.
@@ -456,6 +462,9 @@ export const ReactEditor = {
     // the select event fires twice, once for the old editor's `element`
     // first, and then afterwards for the correct `element`. (2017/03/03)
     const slateNode = ReactEditor.toSlateNode(editor, textNode!)
+    if (!slateNode) {
+      return null
+    }
     const path = ReactEditor.findPath(editor, slateNode)
     return { path, offset }
   },

@@ -557,6 +557,9 @@ export const Editable = (props: EditableProps) => {
               isDOMNode(event.target)
             ) {
               const node = ReactEditor.toSlateNode(editor, event.target)
+              if (!node) {
+                return
+              }
               const path = ReactEditor.findPath(editor, node)
               const start = Editor.start(editor, path)
 
@@ -653,6 +656,9 @@ export const Editable = (props: EditableProps) => {
               !isEventHandled(event, attributes.onDragStart)
             ) {
               const node = ReactEditor.toSlateNode(editor, event.target)
+              if (!node) {
+                return
+              }
               const path = ReactEditor.findPath(editor, node)
               const voidMatch = Editor.void(editor, { at: path })
 
