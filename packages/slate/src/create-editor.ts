@@ -59,7 +59,15 @@ export const createEditor = (): Editor => {
       const oldDirtyPaths = DIRTY_PATHS.get(editor) || []
       const newDirtyPaths = getDirtyPaths(op)
 
-      for (const path of oldDirtyPaths) {
+      for (const path of oldDirtyPaths) {    getFragment: () => {
+        const { selection } = editor
+  
+        if (selection && Range.isExpanded(selection)) {
+          return Node.fragment(editor, selection)
+        }
+        return []
+      },
+  
         const newPath = Path.transform(path, op)
         add(newPath)
       }
@@ -133,6 +141,15 @@ export const createEditor = (): Editor => {
       if (selection && Range.isExpanded(selection)) {
         Transforms.delete(editor)
       }
+    },
+    
+    getFragment: () => {
+      const { selection } = editor
+
+      if (selection && Range.isExpanded(selection)) {
+        return Node.fragment(editor, selection)
+      }
+      return []
     },
 
     insertBreak: () => {

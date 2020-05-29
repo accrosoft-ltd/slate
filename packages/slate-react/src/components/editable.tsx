@@ -614,7 +614,7 @@ export const Editable = (props: EditableProps) => {
               !isEventHandled(event, attributes.onCopy)
             ) {
               event.preventDefault()
-              setFragmentData(event.clipboardData, editor)
+              ReactEditor.setFragmentData(editor, event.clipboardData)
             }
           },
           [attributes.onCopy]
@@ -627,7 +627,7 @@ export const Editable = (props: EditableProps) => {
               !isEventHandled(event, attributes.onCut)
             ) {
               event.preventDefault()
-              setFragmentData(event.clipboardData, editor)
+              ReactEditor.setFragmentData(editor, event.clipboardData)
               const { selection } = editor
 
               if (selection && Range.isExpanded(selection)) {
@@ -675,7 +675,7 @@ export const Editable = (props: EditableProps) => {
                 Transforms.select(editor, range)
               }
 
-              setFragmentData(event.dataTransfer, editor)
+              ReactEditor.setFragmentData(editor, event.dataTransfer)
             }
           },
           [attributes.onDragStart]
