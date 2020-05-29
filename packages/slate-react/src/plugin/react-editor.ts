@@ -1,4 +1,4 @@
-import { Editor, Node, Path, Point, Range, Transforms, Descendant } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -338,7 +338,7 @@ export const ReactEditor = {
 
     if (x == null || y == null) {
       return null
-      //throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
+      // throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
     const node = ReactEditor.toSlateNode(editor, event.target)
@@ -388,7 +388,7 @@ export const ReactEditor = {
 
     if (!domRange) {
       return null
-      //throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
+      // throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
     // Resolve a Slate range from the DOM range.
