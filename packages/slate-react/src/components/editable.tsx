@@ -7,6 +7,7 @@ import {
   Range,
   Text,
   Transforms,
+  Path,
 } from 'slate'
 import throttle from 'lodash/throttle'
 
@@ -562,8 +563,13 @@ export const Editable = (props: EditableProps) => {
               }
               const path = ReactEditor.findPath(editor, node)
               const start = Editor.start(editor, path)
-
-              if (Editor.void(editor, { at: start })) {
+              const end = Editor.end(editor, path);
+              const startVoid = Editor.void(editor, { at: start })
+              const endVoid = Editor.void(editor, { at: end })
+              if (
+                startVoid &&
+                endVoid &&
+                Path.equals(startVoid[1], endVoid[1]) {
                 const range = Editor.range(editor, start)
                 Transforms.select(editor, range)
               }
