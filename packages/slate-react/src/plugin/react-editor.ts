@@ -76,9 +76,12 @@ export const ReactEditor = {
       child = parent
     }
 
-    throw new Error(
+    // eslint-disable-next-line no-console
+    console.error(
       `Unable to find the path for Slate node: ${JSON.stringify(node)}`
     )
+
+    return path
   },
 
   /**
